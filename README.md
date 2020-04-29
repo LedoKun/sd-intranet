@@ -1,6 +1,6 @@
 # sd-intranet
 
-> Internal Website for S.D. Machinery (South East Asia) Co., LTD.
+> Internal Website for S.D. Machinery (Southeast Asia) Co., LTD.
 
 ## Build Setup
 

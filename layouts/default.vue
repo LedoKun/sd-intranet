@@ -43,7 +43,7 @@
     <v-footer :fixed="fixed" padless>
       <v-card class="flex" flat tile>
         <v-card-text class="py-2 white--text text-center">
-          &copy; S.D. Machinery (South East Asia) Co., Ltd.
+          &copy; S.D. Machinery (Southeast Asia) Co., Ltd.
           {{ new Date().getFullYear() }} — By <strong>Ledo Kun</strong><br />
         </v-card-text>
       </v-card>
@@ -77,7 +77,7 @@ export default {
       ],
       miniVariant: false,
       right: true,
-      title: 'S.D. Machinery (South East Asia)'
+      title: 'S.D. Machinery (Southeast Asia)'
     }
   }
 }

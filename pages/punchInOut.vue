@@ -1,19 +1,26 @@
 <template>
   <v-layout column justify-center align-center>
     <v-flex xs12 sm8 md6>
-      <span class="title">ลงเวลาเข้า-ออกงาน</span><br />
-      <span class="display-3 font-weight-thin">
-        {{ date }}
-      </span>
-      <br />
-      <span class="display-3 font-weight-thin">{{ time }}</span>
-      <v-card class="camera-card">
-        <v-spacer />
+      <v-card>
+        <v-card-title class="headline">
+          <span class="title">ลงเวลาเข้า-ออกงาน</span>
+        </v-card-title>
         <v-card-text>
+          <span class="display-2 font-weight-thin">
+            {{ date }}
+          </span>
+          <br />
+          <span class="display-2 font-weight-thin">{{ time }}</span>
+          <br />
+          <small>
+            <em>Location tag: {{ lat }}, {{ lng }}</em>
+          </small>
+          <v-spacer />
           <v-select
             v-model="deviceId"
+            class="select-camera-card"
             :items="devices"
-            item-text="deviceId"
+            item-text="label"
             item-value="deviceId"
             label="กล้อง"
             dense
@@ -49,21 +56,28 @@
 // import { WebCam } from 'vue-web-cam'
 
 export default {
+  // https://www.raymondcamden.com/2019/09/01/using-geolocation-with-vuejs
   components: {
     // 'vue-web-cam': WebCam
   },
 
   data() {
     return {
-      date: null,
-      time: null,
       MOMENT_DATE_OUTPUT_FORMAT: 'L',
       MOMENT_TIME_OUTPUT_FORMAT: 'HH:mm:ss',
+      date: null,
+      time: null,
+
       // Camera components
       img: null,
       camera: null,
       deviceId: null,
-      devices: []
+      devices: [],
+
+      // GPS data
+      positions: [],
+      lat: null,
+      lng: null
     }
   },
 
@@ -77,6 +91,7 @@ export default {
     camera(id) {
       this.deviceId = id
     },
+
     devices() {
       // Once we have a list select the first one
       const camDevices = this.devices
@@ -89,6 +104,7 @@ export default {
 
   mounted() {
     this.startClock()
+    this.getGeolocation()
   },
 
   methods: {
@@ -98,44 +114,88 @@ export default {
         this.time = this.$moment().format(this.MOMENT_TIME_OUTPUT_FORMAT)
       }, 1000)
     },
+
     onCapture() {
       this.img = this.$refs.webcam.capture()
+      this.onStop()
+
+      // TODO
     },
+
     onStarted(stream) {
       // console.log("On Started Event", stream);
     },
+
     onStopped(stream) {
       // console.log("On Stopped Event", stream);
     },
+
     onStop() {
       this.$refs.webcam.stop()
     },
+
     onStart() {
       this.$refs.webcam.start()
     },
-    onError(error) {
+
+    onError(err) {
       if (!this.deviceId) {
         alert('No camera detected!')
       } else {
-        alert('Error detected! ', error)
+        alert('Error Code: ' + err.code + ' Error Message: ' + err.message)
       }
     },
+
     onCameras(cameras) {
       this.devices = cameras
       // console.log('On Cameras Event', cameras)
     },
+
     onCameraChange(deviceId) {
       this.deviceId = deviceId
       this.camera = deviceId
       // console.log('On Camera Change Event', deviceId)
+    },
+
+    getGeolocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          this.successPosition,
+          this.failurePosition,
+          {
+            enableHighAccuracy: true,
+            timeout: 1500,
+            maximumAge: 0
+          }
+        )
+      } else {
+        alert(`Browser doesn't support Geolocation`)
+      }
+    },
+
+    successPosition(position) {
+      this.positions.push({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      })
+
+      if (this.positions.length >= 5) {
+        this.positions.shift()
+      }
+
+      this.lat = position.coords.latitude
+      this.lng = position.coords.longitude
+    },
+
+    failurePosition(err) {
+      alert('Error Code: ' + err.code + ' Error Message: ' + err.message)
     }
   }
 }
 </script>
 
 <style scoped>
-.camera-card {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.select-camera-card {
+  margin-top: 1.5rem;
 }
 </style>
