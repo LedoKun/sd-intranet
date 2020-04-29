@@ -1,5 +1,11 @@
 FROM gitpod/workspace-mongodb
-                    
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -yq tmux && \
+    rm -rf /var/lib/apt/lists/*
+
 USER gitpod
 
 # Install custom tools, runtime, etc. using apt-get
