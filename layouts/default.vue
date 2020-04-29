@@ -32,9 +32,6 @@
       <v-btn icon @click.stop="clipped = !clipped">
         <v-icon>mdi-application</v-icon>
       </v-btn>
-      <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>mdi-minus</v-icon>
-      </v-btn>
       <v-toolbar-title v-text="title" />
       <v-spacer />
     </v-app-bar>
@@ -43,11 +40,11 @@
         <nuxt />
       </v-container>
     </v-content>
-    <v-footer :fixed="fixed" padless app>
+    <v-footer :fixed="fixed" padless>
       <v-card class="flex" flat tile>
         <v-card-text class="py-2 white--text text-center">
-          &copy; S.D. Machinery (South East Asia) Co., LTD.
-          {{ new Date().getFullYear() }} — <strong>By Ledo Kun</strong><br />
+          &copy; S.D. Machinery (South East Asia) Co., Ltd.
+          {{ new Date().getFullYear() }} — By <strong>Ledo Kun</strong><br />
         </v-card-text>
       </v-card>
     </v-footer>
@@ -64,8 +61,13 @@ export default {
       items: [
         {
           icon: 'mdi-apps',
-          title: 'Welcome',
+          title: 'หน้าแรก',
           to: '/'
+        },
+        {
+          icon: 'mdi-calendar-clock',
+          title: 'ลงเวลาเข้า-ออกงาน',
+          to: '/punchInOut'
         },
         {
           icon: 'mdi-chart-bubble',
@@ -75,8 +77,7 @@ export default {
       ],
       miniVariant: false,
       right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js'
+      title: 'S.D. Machinery (South East Asia)'
     }
   }
 }

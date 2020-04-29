@@ -46,7 +46,17 @@ export default {
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    'vue-web-cam/nuxt',
+    [
+      '@nuxtjs/moment',
+      {
+        defaultLocale: 'th',
+        locales: ['th'],
+        timezone: true,
+        defaultTimezone: 'Asia/Bangkok'
+      }
+    ]
   ],
   /*
    ** Axios module configuration
@@ -81,6 +91,6 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {}
+    // extend(config, ctx) {}
   }
 }
