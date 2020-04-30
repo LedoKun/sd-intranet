@@ -68,11 +68,6 @@ export default {
           icon: 'mdi-calendar-clock',
           title: 'ลงเวลาเข้า-ออกงาน',
           to: '/punchInOut'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
         }
       ],
       miniVariant: false,

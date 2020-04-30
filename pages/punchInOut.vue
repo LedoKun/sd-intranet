@@ -8,9 +8,9 @@
         <v-card-text>
           <span class="display-2 font-weight-thin">
             {{ date }}
+            <br />
+            {{ time }}
           </span>
-          <br />
-          <span class="display-2 font-weight-thin">{{ time }}</span>
           <br />
           <small>
             <em>Location tag: {{ lat }}, {{ lng }}</em>
@@ -53,10 +53,7 @@
 </template>
 
 <script>
-// import { WebCam } from 'vue-web-cam'
-
 export default {
-  // https://www.raymondcamden.com/2019/09/01/using-geolocation-with-vuejs
   components: {
     // 'vue-web-cam': WebCam
   },
