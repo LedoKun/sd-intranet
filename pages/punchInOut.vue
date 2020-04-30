@@ -38,9 +38,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="primary" @click="onCapture">
-            บันทึกเวลา
-          </v-btn>
+          <v-btn color="primary" @click="onCapture">บันทึกเวลา</v-btn>
         </v-card-actions>
       </v-card>
       <footer>
@@ -112,11 +110,29 @@ export default {
       }, 1000)
     },
 
+    // https://blog.lichter.io/posts/emails-through-nuxtjs/
     onCapture() {
       this.img = this.$refs.webcam.capture()
       this.onStop()
 
-      // TODO
+      const url = '/api/punchInOut'
+      const payload = {
+        datetimeUtc: this.$moment()
+          .utc()
+          .toDate(),
+        positions: this.positions,
+        image: this.img
+      }
+
+      this.$axios
+        .post(url, payload)
+        .then(function(response) {
+          alert(response.data)
+        })
+        .catch(function(error) {
+          alert(error)
+          this.onStart()
+        })
     },
 
     onStarted(stream) {
@@ -161,7 +177,7 @@ export default {
           this.failurePosition,
           {
             enableHighAccuracy: true,
-            timeout: 1500,
+            timeout: 1000,
             maximumAge: 0
           }
         )
