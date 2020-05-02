@@ -23,6 +23,7 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/moment": "^1.6.0",
+    "face-api.js": "^0.22.2",
     "nuxt": "^2.0.0",
     "vue-web-cam": "^1.9.0"
   },

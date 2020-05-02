@@ -25,16 +25,20 @@
             label="กล้อง"
             dense
           ></v-select>
-          <vue-web-cam
-            ref="webcam"
-            :device-id="deviceId"
-            width="100%"
-            @started="onStarted"
-            @stopped="onStopped"
-            @error="onError"
-            @cameras="onCameras"
-            @camera-change="onCameraChange"
-          />
+          <div class="webcam-container">
+            <vue-web-cam
+              id="webcam"
+              :device-id="deviceId"
+              height="400"
+              width="100%"
+              @started="onStarted"
+              @stopped="onStopped"
+              @error="onError"
+              @cameras="onCameras"
+              @camera-change="onCameraChange"
+            />
+            <canvas id="overlay" width="100%" />
+          </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -51,10 +55,10 @@
 </template>
 
 <script>
+import * as faceapi from 'face-api.js'
+
 export default {
-  components: {
-    // 'vue-web-cam': WebCam
-  },
+  components: {},
 
   data() {
     return {
@@ -97,9 +101,16 @@ export default {
     }
   },
 
+  async beforeMount() {
+    // face detection
+    await faceapi.loadTinyFaceDetectorModel('/weights')
+    // this.faceapi_loaded = true
+  },
+
   mounted() {
     this.startClock()
     this.getGeolocation()
+    this.startFaceDetection()
   },
 
   methods: {
@@ -110,7 +121,30 @@ export default {
       }, 1000)
     },
 
-    // https://blog.lichter.io/posts/emails-through-nuxtjs/
+    startFaceDetection() {
+      const video = document.getElementById('webcam')
+
+      video.addEventListener('play', () => {
+        const canvas = document.getElementById('overlay')
+        const displaySize = { width: video.width, height: video.height }
+        faceapi.matchDimensions(canvas, displaySize)
+
+        setInterval(async () => {
+          const detections = await faceapi.detectAllFaces(
+            video,
+            new faceapi.TinyFaceDetectorOptions()
+          )
+
+          const resizedDetections = faceapi.resizeResults(
+            detections,
+            displaySize
+          )
+          canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+          faceapi.draw.drawDetections(canvas, resizedDetections)
+        }, 100)
+      })
+    },
+
     onCapture() {
       this.img = this.$refs.webcam.capture()
       this.onStop()
@@ -210,5 +244,17 @@ export default {
 <style scoped>
 .select-camera-card {
   margin-top: 1.5rem;
+}
+.webcam-container {
+  display: grid;
+}
+#webcam,
+#overlay {
+  grid-area: 1 / 1;
+}
+#overlay {
+  z-index: 100;
+  width: 100%;
+  height: 100%;
 }
 </style>
