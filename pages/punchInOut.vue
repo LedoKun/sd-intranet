@@ -29,15 +29,15 @@
             <vue-web-cam
               id="webcam"
               :device-id="deviceId"
-              height="400"
-              width="100%"
+              height="400px"
+              width="300px"
               @started="onStarted"
               @stopped="onStopped"
               @error="onError"
               @cameras="onCameras"
               @camera-change="onCameraChange"
             />
-            <canvas id="overlay" width="100%" />
+            <canvas id="overlay" />
           </div>
         </v-card-text>
         <v-card-actions>
@@ -254,7 +254,7 @@ export default {
 }
 #overlay {
   z-index: 100;
-  width: 100%;
-  height: 100%;
+  width: 300px;
+  height: 400px;
 }
 </style>
