@@ -6,13 +6,13 @@
           <span class="title">ลงเวลาเข้า-ออกงาน</span>
         </v-card-title>
         <v-card-text>
-          <span class="display-2 font-weight-thin">
+          <span v-if="date && lat" class="display-2 font-weight-thin">
             {{ date }}
             <br />
             {{ time }}
           </span>
           <br />
-          <small>
+          <small v-if="date && lat">
             <em>Location tag: {{ lat }}, {{ lng }}</em>
           </small>
           <v-spacer />
@@ -43,7 +43,13 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="primary" @click="onCapture">บันทึกเวลา</v-btn>
+          <v-btn
+            color="primary"
+            :loading="!isPayloadValid()"
+            :disable="!isPayloadValid()"
+            @click="onCapture"
+            >บันทึกเวลา</v-btn
+          >
         </v-card-actions>
       </v-card>
       <footer>
@@ -74,10 +80,17 @@ export default {
       deviceId: null,
       devices: [],
 
+      faceDetectionScore: 0,
+
       // GPS data
       positions: [],
       lat: null,
-      lng: null
+      lng: null,
+
+      // intervals, watch
+      timeUpdateInterval: null,
+      faceDetectionInterval: null,
+      gpsWatch: null
     }
   },
 
@@ -103,9 +116,7 @@ export default {
   },
 
   async beforeMount() {
-    // face detection
     await faceapi.loadTinyFaceDetectorModel('/weights')
-    // this.faceapi_loaded = true
   },
 
   mounted() {
@@ -115,11 +126,15 @@ export default {
   },
 
   methods: {
-    startClock(city) {
-      setInterval((_) => {
+    isPayloadValid() {
+      return this.faceDetectionScore > 0.5 && this.positions.length > 4
+    },
+
+    startClock() {
+      this.timeUpdateInterval = setInterval(() => {
         this.date = this.$moment().format(this.MOMENT_DATE_OUTPUT_FORMAT)
         this.time = this.$moment().format(this.MOMENT_TIME_OUTPUT_FORMAT)
-      }, 1000)
+      }, 500)
     },
 
     startFaceDetection() {
@@ -130,14 +145,16 @@ export default {
         const displaySize = { width: video.width, height: video.height }
         faceapi.matchDimensions(canvas, displaySize)
 
-        setInterval(async () => {
-          const detections = await faceapi.detectAllFaces(
+        this.faceDetectionInterval = setInterval(async () => {
+          const detection = await faceapi.detectSingleFace(
             video,
             new faceapi.TinyFaceDetectorOptions()
           )
 
+          this.faceDetectionScore = detection.score
+
           const resizedDetections = faceapi.resizeResults(
-            detections,
+            detection,
             displaySize
           )
           canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
@@ -148,7 +165,7 @@ export default {
 
     onCapture() {
       this.img = this.$refs.webcam.capture()
-      this.onStop()
+      this.$refs.webcam.pause()
 
       const url = '/api/punchInOut'
       const payload = {
@@ -156,14 +173,36 @@ export default {
         image: this.img
       }
 
+      navigator.geolocation.clearWatch(this.gpsWatch)
+      clearInterval(this.timeUpdateInterval)
+      clearInterval(this.faceDetectionInterval)
+
+      const self = this
+
       this.$axios
         .post(url, payload)
         .then(function(response) {
-          alert(response.data)
+          self.onSubmitSuccess()
         })
         .catch(function(error) {
-          alert(error)
+          self.onSubmitFailure(error)
         })
+    },
+
+    onSubmitSuccess() {
+      alert('บันทึกเวลาสำเร็จ')
+    },
+
+    onSubmitFailure(error) {
+      alert('กรุณาลองอีกครั้ง')
+
+      console.error(error) // eslint-disable-line no-console
+
+      this.$refs.webcam.resume()
+
+      this.startClock()
+      this.getGeolocation()
+      this.startFaceDetection()
     },
 
     onStarted(stream) {
@@ -203,7 +242,7 @@ export default {
 
     getGeolocation() {
       if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
+        this.gpsWatch = navigator.geolocation.watchPosition(
           this.successPosition,
           this.failurePosition,
           {
