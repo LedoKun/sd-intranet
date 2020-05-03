@@ -28,6 +28,7 @@
           <div class="webcam-container">
             <vue-web-cam
               id="webcam"
+              ref="webcam"
               :device-id="deviceId"
               height="400px"
               width="300px"
@@ -141,7 +142,7 @@ export default {
           )
           canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
           faceapi.draw.drawDetections(canvas, resizedDetections)
-        }, 100)
+        }, 500)
       })
     },
 
@@ -151,9 +152,6 @@ export default {
 
       const url = '/api/punchInOut'
       const payload = {
-        datetimeUtc: this.$moment()
-          .utc()
-          .toDate(),
         positions: this.positions,
         image: this.img
       }
@@ -165,7 +163,6 @@ export default {
         })
         .catch(function(error) {
           alert(error)
-          this.onStart()
         })
     },
 
@@ -226,7 +223,7 @@ export default {
         lng: position.coords.longitude
       })
 
-      if (this.positions.length >= 5) {
+      if (this.positions.length > 5) {
         this.positions.shift()
       }
 

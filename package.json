@@ -23,7 +23,9 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/moment": "^1.6.0",
+    "express-validator": "^6.4.1",
     "face-api.js": "^0.22.2",
+    "is-base64": "^1.1.0",
     "nuxt": "^2.0.0",
     "vue-web-cam": "^1.9.0"
   },
