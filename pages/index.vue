@@ -12,9 +12,7 @@
 export default {
   components: {},
   data() {
-    return {
-      title: 'ข่าวสาร'
-    }
+    return {}
   }
 }
 </script>
@@ -24,7 +22,6 @@ export default {
   position: fixed;
   top: 50%;
   left: 50%;
-  /* bring your own prefixes */
   transform: translate(-50%, -50%);
 }
 </style>

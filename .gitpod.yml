@@ -1,6 +1,6 @@
 tasks:
   - init: yarn install
-    command: yarn dev
+    command: mongod & && yarn dev
 image:
   file: .gitpod.Dockerfile
 
