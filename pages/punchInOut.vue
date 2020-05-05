@@ -48,6 +48,7 @@
             :loading="!isPayloadValid()"
             :disabled="!isPayloadValid() || isPunched"
             @click="onCapture"
+            :block="true"
             >บันทึกเวลา</v-btn
           >
         </v-card-actions>
