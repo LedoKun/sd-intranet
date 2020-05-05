@@ -43,7 +43,7 @@
 
             <template v-slot:item.positions="{ item }">
               <div class="p-2">
-                <td class="text-start">
+                <span class="text-start">
                   <em>
                     <span
                       v-for="coordinate in item.positions"
@@ -62,17 +62,17 @@
                       <br />
                     </span>
                   </em>
-                </td>
+                </span>
               </div>
             </template>
 
             <template v-slot:item.punchTime="{ item }">
               <div class="p-2">
-                <td class="text-start">
+                <span class="text-start">
                   {{ $moment(item.punchTime).format('dddd, DD MMMM YYYY') }}
                   <br />
                   เวลา {{ $moment(item.punchTime).format('hh:mm:ss') }}
-                </td>
+                </span>
               </div>
             </template>
           </v-data-table>
@@ -175,8 +175,8 @@ export default {
 
 <style scoped>
 .img-table {
-  max-width: 30rem;
-  max-height: 30rem;
+  max-width: 20rem;
+  max-height: 20rem;
   width: auto;
   height: auto;
 }
