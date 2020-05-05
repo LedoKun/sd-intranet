@@ -68,6 +68,11 @@ export default {
           icon: 'mdi-calendar-clock',
           title: 'ลงเวลาเข้า-ออกงาน',
           to: '/punchInOut'
+        },
+        {
+          icon: 'mdi-book-open',
+          title: 'บันทึกเวลาเข้า-ออกงาน',
+          to: '/viewPunchTime'
         }
       ],
       miniVariant: false,

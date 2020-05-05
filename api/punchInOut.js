@@ -8,7 +8,8 @@ const app = express()
 app.use(express.json())
 app.use(morgan('combined'))
 
-const { body, validationResult } = require('express-validator')
+const { body, query, validationResult } = require('express-validator')
+const PunchTimeModel = require('./models/punchTime')
 
 const checkLat = /^(-?[1-8]?\d(?:\.\d{1,18})?|90(?:\.0{1,18})?)$/
 const checkLng = /^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/
@@ -16,6 +17,40 @@ const checkLng = /^(-?(?:1[0-7]|[1-9])?\d(?:\.\d{1,18})?|180(?:\.0{1,18})?)$/
 mongoose.connect('mongodb://localhost:27017/sd', {
   useNewUrlParser: true
 })
+
+app.get(
+  '/',
+  [query('startDate').toDate(), query('stopDate').toDate()],
+  async (req, res) => {
+    const errors = validationResult(req)
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
+
+    let payload
+
+    if (req.query.startDate && req.query.stopDate) {
+      payload = await PunchTimeModel.find({
+        punchTime: {
+          $gte: moment.utc(req.query.startDate).startOf('Day'),
+          $lte: moment.utc(req.query.stopDate).endOf('Day')
+        }
+      })
+    } else if (req.query.startDate && !req.query.stopDate) {
+      payload = await PunchTimeModel.find({
+        punchTime: {
+          $gte: moment.utc(req.query.startDate).startOf('Day'),
+          $lte: moment.utc(req.query.startDate).endOf('Day')
+        }
+      })
+    } else {
+      payload = await PunchTimeModel.find()
+    }
+
+    return res.status(200).json(payload)
+  }
+)
 
 app.post(
   '/',
@@ -50,6 +85,10 @@ app.post(
     // and wraps them in an object with handy functions
     const errors = validationResult(req)
 
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
+
     const payload = {
       ...req.body,
       punchTime: moment()
@@ -57,11 +96,6 @@ app.post(
         .toDate()
     }
 
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() })
-    }
-
-    const PunchTimeModel = require('./models/punchTime')
     const punchTime = new PunchTimeModel(payload)
     await punchTime.save()
 
