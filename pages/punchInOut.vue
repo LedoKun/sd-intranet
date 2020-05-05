@@ -46,7 +46,7 @@
           <v-btn
             color="primary"
             :loading="!isPayloadValid()"
-            :disable="!isPayloadValid()"
+            :disabled="!isPayloadValid() || isPunched"
             @click="onCapture"
             >บันทึกเวลา</v-btn
           >
@@ -90,7 +90,10 @@ export default {
       // intervals, watch
       timeUpdateInterval: null,
       faceDetectionInterval: null,
-      gpsWatch: null
+      gpsWatch: null,
+
+      // form control
+      isPunched: false
     }
   },
 
@@ -127,7 +130,7 @@ export default {
 
   methods: {
     isPayloadValid() {
-      return this.faceDetectionScore > 0.5 && this.positions.length > 4
+      return this.faceDetectionScore > 0.5 && this.positions.length > 10
     },
 
     startClock() {
@@ -190,6 +193,7 @@ export default {
     },
 
     onSubmitSuccess() {
+      this.isPunched = true
       alert('บันทึกเวลาสำเร็จ')
     },
 
@@ -200,6 +204,7 @@ export default {
 
       this.$refs.webcam.resume()
 
+      this.isPunched = false
       this.startClock()
       this.getGeolocation()
       this.startFaceDetection()
@@ -262,7 +267,7 @@ export default {
         lng: position.coords.longitude
       })
 
-      if (this.positions.length > 5) {
+      if (this.positions.length > 10) {
         this.positions.shift()
       }
 

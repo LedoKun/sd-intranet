@@ -56,7 +56,7 @@ app.post(
   '/',
   [
     body('positions').custom((values) => {
-      if (values.length < 4) {
+      if (values.length < 9) {
         throw new Error('Insufficient coordinate data')
       }
 
