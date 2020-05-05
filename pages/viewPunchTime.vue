@@ -46,10 +46,19 @@
                 <td class="text-start">
                   <em>
                     <span
-                      v-for="coordinate in coordinateStr(item.positions)"
+                      v-for="coordinate in item.positions"
                       :key="coordinate"
                     >
-                      <small>{{ coordinate }}</small>
+                      <v-icon
+                        v-if="isInside(coordinate)"
+                        x-large
+                        color="green darken-2"
+                        >mdi-check</v-icon
+                      >
+                      <v-icon v-else x-large color="red darken-2"
+                        >mdi-alpha-x</v-icon
+                      >
+                      <small>{{ coordinateStr(coordinate) }}</small>
                       <br />
                     </span>
                   </em>
@@ -74,6 +83,8 @@
 </template>
 
 <script>
+import { isPointWithinRadius } from 'geolib'
+
 export default {
   components: {},
 
@@ -127,10 +138,8 @@ export default {
       this.dates = [startDate, stopDate]
     },
 
-    coordinateStr(positions) {
-      return positions.map((position) => {
-        return '[' + position.lat + ',' + position.lng + ']'
-      })
+    coordinateStr(position) {
+      return '[' + position.lat + ',' + position.lng + ']'
     },
 
     async getData() {
@@ -151,6 +160,14 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    isInside(position) {
+      return isPointWithinRadius(
+        { latitude: 13.808508, longitude: 100.721072 },
+        { latitude: position.lat, longitude: position.lng },
+        30
+      )
     }
   }
 }

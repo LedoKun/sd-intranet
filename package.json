@@ -25,6 +25,7 @@
     "@nuxtjs/moment": "^1.6.0",
     "express-validator": "^6.4.1",
     "face-api.js": "^0.22.2",
+    "geolib": "^3.2.1",
     "is-base64": "^1.1.0",
     "mongoose": "^5.9.11",
     "morgan": "^1.10.0",
