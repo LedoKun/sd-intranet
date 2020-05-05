@@ -8,15 +8,6 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-text-field
-            v-model="dateRangeText"
-            label="แสดงช่วงเวลา"
-            readonly
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
           <v-date-picker
             v-model="dates"
             full-width
@@ -26,15 +17,56 @@
             color="amber darken-4"
             :show-current="true"
             range
-            @change="getData"
             :loading="loading"
             loading-text="Loading... Please wait"
+            @change="getData"
           ></v-date-picker>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <v-data-table :headers="headers" :items="items" class="elevation-1" />
+          <v-text-field
+            v-model="dateRangeText"
+            label="แสดงช่วงเวลา"
+            readonly
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-data-table :headers="headers" :items="items" class="elevation-1">
+            <template v-slot:item.image="{ item }">
+              <div class="p-2">
+                <v-img :src="item.image" :alt="'รูป'" class="img-table"></v-img>
+              </div>
+            </template>
+
+            <template v-slot:item.positions="{ item }">
+              <div class="p-2">
+                <td class="text-start">
+                  <em>
+                    <span
+                      v-for="coordinate in coordinateStr(item.positions)"
+                      :key="coordinate"
+                    >
+                      <small>{{ coordinate }}</small>
+                      <br />
+                    </span>
+                  </em>
+                </td>
+              </div>
+            </template>
+
+            <template v-slot:item.punchTime="{ item }">
+              <div class="p-2">
+                <td class="text-start">
+                  {{ $moment(item.punchTime).format('dddd, DD MMMM YYYY') }}
+                  <br />
+                  เวลา {{ $moment(item.punchTime).format('hh:mm:ss') }}
+                </td>
+              </div>
+            </template>
+          </v-data-table>
         </v-col>
       </v-row>
     </v-container>
@@ -62,9 +94,9 @@ export default {
           value: 'positions'
         },
         {
-          text: 'punchTime',
+          text: 'ลงเวลา',
           sortable: true,
-          value: 'ลงเวลา'
+          value: 'punchTime'
         }
       ]
     }
@@ -72,7 +104,11 @@ export default {
 
   computed: {
     dateRangeText() {
-      return this.dates.join(' ~ ')
+      const dateRange = this.dates.map((date) => {
+        return this.$moment(date).format('DD/MM/YYYY')
+      })
+
+      return dateRange.join(' - ')
     }
   },
 
@@ -89,6 +125,12 @@ export default {
       const stopDate = this.$moment().format('YYYY-MM-DD')
 
       this.dates = [startDate, stopDate]
+    },
+
+    coordinateStr(positions) {
+      return positions.map((position) => {
+        return '[' + position.lat + ',' + position.lng + ']'
+      })
     },
 
     async getData() {
@@ -114,4 +156,11 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.img-table {
+  max-width: 30rem;
+  max-height: 30rem;
+  width: auto;
+  height: auto;
+}
+</style>
