@@ -130,7 +130,7 @@ export default {
 
   methods: {
     isPayloadValid() {
-      return this.faceDetectionScore > 0.5 && this.positions.length > 10
+      return this.faceDetectionScore > 0.5 && this.positions.length > 9
     },
 
     startClock() {
